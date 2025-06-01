@@ -15,6 +15,7 @@ dist-ssr
 .vscode
 .git
 *__pycache__*
+.env
 
 # Editor directories and files
 .vscode/*

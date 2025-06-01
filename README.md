@@ -94,7 +94,7 @@ Abre una terminal nueva, activa el entorno virtual (paso 2), y ejecuta:
 ### En Linux/macOS
 
 ```bash
-.venv/bin/uvicorn backend.api.app:app --reload --host "127.0.0.1" --port 8000 --app-dir backend
+.venv/bin/uvicorn backend.api.app:app --reload --host "127.0.0.1" --port 8000
 ```
 
 Esto arrancará el servidor backend con recarga automática para desarrollo.
@@ -132,3 +132,15 @@ Esto abrirá la app en tu navegador automáticamente o te mostrará la direcció
 Si encuentras algún problema o tienes dudas, no dudes en preguntar.
 
 ---
+
+## Extra. Formateo de código
+
+Se utiliza black formatter y flake8 para el código.
+
+Se recomienda ejecutar el siguiente comando desde la raíz del proyecto:
+
+```bash
+black . --preview --line-length 120
+```
+
+Para corregir errores de formato, utilizar el atajo de teclado `Ctrl + Shift + I`.

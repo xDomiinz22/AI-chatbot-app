@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 .message {
   margin: 0.5rem 0;
   max-width: 80%;

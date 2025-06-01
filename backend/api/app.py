@@ -2,11 +2,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.gemini_provider.gemini_ai import GeminiAI
-
+from backend.ai_providers.agent_wrapper import ModelAgent
 
 app = FastAPI()
-gemini = GeminiAI()
 
 # Configuración CORS
 origins = [
@@ -25,11 +23,14 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     message: str
+    provider: str
+    model: str
 
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    response = gemini.content_generator(request.message)
+    agent = ModelAgent(provider=request.provider, model_name=request.model)
+    response = await agent.ask(request.message)
     return {"reply": response}
 
 
