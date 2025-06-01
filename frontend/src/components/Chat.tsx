@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, KeyboardEvent, useRef, useEffect } from "react";
 import Message from './Message';
 import SettingsPanel from './SettingsPanel';
+import Cookies from "js-cookie";
 
 type ProviderName = "OpenAI" | "HuggingFace" | "Google";
 
@@ -29,7 +30,25 @@ function Chat() {
     const selectedProvider = e.target.value as ProviderName;
     setProvider(selectedProvider);
     setModel(providers[selectedProvider][0]);
+
+    Cookies.set("provider", selectedProvider, { expires: 7 });
+    Cookies.set("model", providers[selectedProvider][0], { expires: 7 });
   };
+
+  const handleModelChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setModel(e.target.value);
+    Cookies.set("model", e.target.value, { expires: 7 });
+  };
+
+  useEffect(() => {
+    const savedProvider = Cookies.get("provider") as ProviderName;
+    const savedModel = Cookies.get("model");
+
+    if (savedProvider && providers[savedProvider]?.includes(savedModel || "")) {
+      setProvider(savedProvider);
+      setModel(savedModel);
+    }
+  }, []);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -162,7 +181,7 @@ function Chat() {
               model={model}
               providers={providers}
               onProviderChange={handleProviderChange}
-              onModelChange={(e) => setModel(e.target.value)}
+              onModelChange={handleModelChange}
               onClose={() => toggleSettings()}
               show={showSettings}
             />
