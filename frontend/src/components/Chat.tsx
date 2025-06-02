@@ -3,6 +3,7 @@ import Message from './Message';
 import SettingsPanel from './SettingsPanel';
 import Cookies from "js-cookie";
 
+
 type ProviderName = "OpenAI" | "HuggingFace" | "Google";
 
 type Providers = {
@@ -82,7 +83,7 @@ function Chat() {
         ...prev,
         {
           sender: "bot",
-          text: "Lo siento, hubo un error al conectar con el servidor.",
+          text: "Sorry, we are having issues.",
         },
       ]);
       console.error(error);
@@ -187,7 +188,7 @@ function Chat() {
             />
           )}
 
-          <div className="items-end flex max-w-[20%] ml-4">
+          <div className="items-end flex max-w-[20%] ml-1">
             <button onClick={handleSend} className="bg-[#2a9d8f] p-2 border rounded-br-md border-[#2a9d8f] 
           text-bold focus:bg-[#238075] focus:outline-0 font-sans transition duration-300
           text-white placeholder-[#999] hover:bg-[#238075] hover:outline-0">
