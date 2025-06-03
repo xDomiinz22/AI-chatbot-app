@@ -174,7 +174,7 @@ function Chat() {
           >
             ⚙️
           </button>
-
+ 
           {showSettings && (
             <SettingsPanel
               ref={settingsRef}

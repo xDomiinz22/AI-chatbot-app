@@ -9,16 +9,44 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         if (!email || !password) {
             alert("All field required.");
         }
-        // Validar en backend
-        Cookies.set("email", email, {expires: 7});
-        Cookies.set("password", password, {expires: 7});
-        onLoginSuccess();
+        try {
+            const response = await fetch("http://localhost:8000/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                alert(errorData.detail || "Login failed");
+                return;
+            }
+
+            const data = await response.json();
+
+            Cookies.set("token", data.token, {
+                            expires: 2,
+                            secure: true,
+                            sameSite: "Strict",
+                            httpOnly: false
+                        })
+            Cookies.set("email", data.email, { expires: 7 });
+            Cookies.set("userId", String(data.id), { expires: 7 });
+
+            onLoginSuccess();
+
+        } catch (error) {
+            console.error("Error during login:", error);
+            alert("An error occurred during login.");
+        }
     }
 
     return (

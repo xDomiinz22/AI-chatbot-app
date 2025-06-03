@@ -10,80 +10,112 @@ const App: React.FC = () => {
   const [showRegister, setShowRegister] = useState(false);
 
   useEffect(() => {
-    const email = Cookies.get("email");
-    const password = Cookies.get("password");
+    const validateUser = async () => {
+      const token = Cookies.get("token");
 
-    // Validar en backend
-    if (email && password) {
-      setIsAuthenticated(true)
-    }
+      if (token) {
+        try {
+          const res = await fetch("http://localhost:8000/validate-token", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (!res.ok) throw new Error("Invalid user");
+
+          await res.json();
+          setIsAuthenticated(true);
+        } catch (err) {
+          console.error("Error validating user:", err);
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    validateUser();
   }, []);
 
+
   const handleLogin = () => setIsAuthenticated(true);
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const token = Cookies.get("token");
+    if (token) {
+      try {
+        await fetch("http://localhost:8000/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } catch (error) {
+        console.error("Error during logout:", error);
+      }
+    }
     Cookies.remove("email");
-    Cookies.remove("password");
+    Cookies.remove("name");
+    Cookies.remove("token");
     setIsAuthenticated(false);
   };
 
-    if (!isAuthenticated) {
-      return (
-        <div className="min-h-screen bg-gray-200 flex items-center justify-center">
-          <div className="w-full max-w-[600px] bg-white rounded-[10px] shadow-md p-8">
-            <h1 className="font-bold text-4xl text-[#2a9d8f] mb-6 text-center">
-              Mini-AI-Chatbot
-            </h1>
-            {showRegister ? (
-              <>
-                <Register onRegisterSuccess={handleLogin} />
-                <p className="mt-4 text-sm text-center text-[#2a9d8f]">
-                  Already have an account?{" "}
-                  <button className="ml-[2px] text-[#27887d]" onClick={() => setShowRegister(false)}>
-                    Login here
-                  </button>
-                </p>
-              </>
-            ) : (
-              <>
-                <Login onLoginSuccess={handleLogin} />
-                <p className="mt-4 text-sm text-center text-[#2a9d8f]">
-                  Don't have an account?{" "}
-                  <button className="ml-[2px] text-[#27887d]" onClick={() => setShowRegister(true)}>
-                    Register here
-                  </button>
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      );
-    }
-
+  if (!isAuthenticated) {
     return (
-      <div className="flex h-screen bg-gray-200">
-        {/* Sidebar izquierda */}
-        <aside className="fixed top-0 left-0 h-screen w-[20%] bg-white shadow-md z-10 flex flex-col items-center py-4">
-          <h1 className="font-bold text-2xl text-[#2a9d8f] mb-6 text-center">Menu</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition mt-auto"
-          >
-            Logout
-          </button>
-        </aside>
-
-        {/* Contenido principal */}
-        <main className="flex items-center justify-center p-4 w-full">
-          <div className="w-[800px] bg-white rounded-[10px] shadow-md p-8">
-            <h1 className="font-bold text-4xl text-[#2a9d8f] mb-6 text-center">
-              Mini-AI-Chatbot
-            </h1>
-            <Chat />
-          </div>
-        </main>
+      <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+        <div className="w-full max-w-[600px] bg-white rounded-[10px] shadow-md p-8">
+          <h1 className="font-bold text-4xl text-[#2a9d8f] mb-6 text-center">
+            Mini-AI-Chatbot
+          </h1>
+          {showRegister ? (
+            <>
+              <Register onRegisterSuccess={handleLogin} />
+              <p className="mt-4 text-sm text-center text-[#2a9d8f]">
+                Already have an account?{" "}
+                <button className="ml-[2px] text-[#27887d]" onClick={() => setShowRegister(false)}>
+                  Login here
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <Login onLoginSuccess={handleLogin} />
+              <p className="mt-4 text-sm text-center text-[#2a9d8f]">
+                Don't have an account?{" "}
+                <button className="ml-[2px] text-[#27887d]" onClick={() => setShowRegister(true)}>
+                  Register here
+                </button>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     );
-  };
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-200">
+      {/* Sidebar izquierda */}
+      <aside className="fixed top-0 left-0 h-screen w-[20%] bg-white shadow-md z-10 flex flex-col items-center py-4">
+        <h1 className="font-bold text-2xl text-[#2a9d8f] mb-6 text-center">Menu</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition mt-auto"
+        >
+          Logout
+        </button>
+      </aside>
+
+      {/* Contenido principal */}
+      <main className="flex items-center justify-center p-4 w-full">
+        <div className="w-[800px] bg-white rounded-[10px] shadow-md p-8">
+          <h1 className="font-bold text-4xl text-[#2a9d8f] mb-6 text-center">
+            Mini-AI-Chatbot
+          </h1>
+          <Chat />
+        </div>
+      </main>
+    </div>
+  );
+};
 
 
-  export default App;
+export default App;

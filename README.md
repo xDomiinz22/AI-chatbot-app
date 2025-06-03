@@ -92,7 +92,7 @@ Abre una terminal nueva, activa el entorno virtual (paso 2), y ejecuta:
 ```
 
 ### En Linux/macOS
-
+sudo systemctl postgresql
 ```bash
 .venv/bin/uvicorn backend.api.app:app --reload --host "127.0.0.1" --port 8000
 ```
