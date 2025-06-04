@@ -1,6 +1,5 @@
 from fastapi_mail import ConnectionConfig
 from pydantic import BaseModel, EmailStr, Field
-from pathlib import Path
 from backend.config import MAIL_USERNAME, MAIL_FROM, MAIL_PASSWORD
 
 
@@ -15,7 +14,6 @@ class Settings(BaseModel):
     MAIL_SSL_TLS: bool = Field(default=False)
     USE_CREDENTIALS: bool = Field(default=True)
     VALIDATE_CERTS: bool = Field(default=True)
-    TEMPLATE_FOLDER: Path = Path(__file__).parent
 
 
 conf = ConnectionConfig(
@@ -29,5 +27,4 @@ conf = ConnectionConfig(
     MAIL_FROM_NAME=Settings().MAIL_FROM_NAME,
     USE_CREDENTIALS=Settings().USE_CREDENTIALS,
     VALIDATE_CERTS=Settings().VALIDATE_CERTS,
-    TEMPLATE_FOLDER=Settings().TEMPLATE_FOLDER,
 )

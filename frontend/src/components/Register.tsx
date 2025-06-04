@@ -1,5 +1,4 @@
 import { useState, FormEvent } from "react";
-import Cookies from "js-cookie";
 import zxcvbn from "zxcvbn"
 import SHA1 from "crypto-js/sha1"
 
@@ -19,7 +18,7 @@ const Register = ({ onRegisterSuccess }: RegisterProps) => {
         const pwd = e.target.value;
         setPassword(pwd);
         const result = zxcvbn(pwd);
-        setPasswordScore(result.score); // Score va de 0 (débil) a 4 (fuerte)
+        setPasswordScore(result.score); // Score goes from 0 (weak) to 4 (strong)
     };
 
     const handleSubmit = async (e: FormEvent) => {
@@ -63,16 +62,6 @@ const Register = ({ onRegisterSuccess }: RegisterProps) => {
                 return;
             }
             
-            Cookies.set("token", data.token, {
-                expires: 2,
-                secure: true,
-                sameSite: "Strict",
-                httpOnly: false
-            })
-            Cookies.set("name", name, { expires: 7 });
-            Cookies.set("email", email, { expires: 7 });
-            Cookies.set("user_id", String(data.user_id), { expires: 7 });
-
             onRegisterSuccess();
 
         } catch (error) {

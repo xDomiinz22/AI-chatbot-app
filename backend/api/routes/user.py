@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from backend.authentication.crud import (
     DatabaseMethods,
@@ -17,10 +18,10 @@ async def register(user: UserCreate):
     db_user = db_methods.get_user_by_email(user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    db_user, user_token = await db_methods.create_user(user)
+    db_user = await db_methods.create_user(user)
     return UserOut(
         email=db_user.email,
-        token=user_token.token,
+        token="",
         is_verified=db_user.is_verified,
     )
 
@@ -32,10 +33,16 @@ def login(user: UserLogin):
         user.password, db_user.hashed_password
     ):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    user_token = db_methods.create_token(db_user.email)
+    if db_user.is_verified:
+        user_token = db_methods.create_token(db_user.email)
+        return UserOut(
+            email=db_user.email,
+            token=user_token.token,
+            is_verified=db_user.is_verified,
+        )
     return UserOut(
         email=db_user.email,
-        token=user_token.token,
+        token="",
         is_verified=db_user.is_verified,
     )
 
@@ -67,4 +74,4 @@ def verify_email(token: str):
         db_methods.verificate_email(token)
     except EmailTokenException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-    return {"message": "Email verified successfully"}
+    return RedirectResponse(url="http://localhost:5173/login?verified=true", status_code=302)

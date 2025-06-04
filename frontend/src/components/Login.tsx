@@ -1,5 +1,6 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import Cookies from "js-cookie";
+import { useLocation } from "react-router-dom"
 
 type LoginProps = {
     onLoginSuccess: () => void;
@@ -8,6 +9,25 @@ type LoginProps = {
 const Login = ({ onLoginSuccess }: LoginProps) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [isMounted, setIsMounted] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("verified") === "true") {
+            setIsMounted(true);
+            setTimeout(() => setIsVisible(true), 10);
+
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+                setTimeout(() => setIsMounted(false), 1000);
+            }, 5000);
+
+            return () => {
+                clearTimeout(timer);
+            };
+        }
+    }, []);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -56,6 +76,17 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md border rounded mt-10">
             <h2 className="text-2xl font-bold text-[#2a9d8f] mb-4 text-center">Login</h2>
+            <div
+                className={`mb-4 h-2 max-w-full transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                aria-live="polite"
+            >
+                {isMounted && (
+                    <div className="text-[#33bbab] rounded text-center h-full flex items-center justify-center">
+                        Your account has been verified!
+                    </div>
+                )}
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block mb-1 font-medium text-[#2a9d8f]">Email:</label>

@@ -58,10 +58,9 @@ class DatabaseMethods:
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
-        token = self.create_token(email=db_user.email)
         email_token = self.generate_email_verification_token(user.email)
         await self.email_methods.send_verification_email(user.email, email_token)
-        return db_user, token
+        return db_user
 
     def verify_password(self, plain_password: str, hashed_password: str):
         return self.pwd_context.verify(plain_password, hashed_password)
