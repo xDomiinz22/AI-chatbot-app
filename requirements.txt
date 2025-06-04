@@ -12,3 +12,4 @@ SQLAlchemy==2.0.41
 psycopg2-binary==2.9.10
 pydantic[email]
 passlib[argon2]
+fastapi-mail==1.5.0

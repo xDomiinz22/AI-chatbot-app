@@ -32,14 +32,18 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
 
             const data = await response.json();
 
+            if (!data.is_verified) {
+                alert("Verification email sent. Please verify you email before logging in.");
+                return;
+            }
+
             Cookies.set("token", data.token, {
-                            expires: 2,
-                            secure: true,
-                            sameSite: "Strict",
-                            httpOnly: false
-                        })
+                expires: 2,
+                secure: true,
+                sameSite: "Strict",
+                httpOnly: false
+            })
             Cookies.set("email", data.email, { expires: 7 });
-            Cookies.set("userId", String(data.id), { expires: 7 });
 
             onLoginSuccess();
 

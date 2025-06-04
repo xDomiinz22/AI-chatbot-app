@@ -36,6 +36,19 @@ const App: React.FC = () => {
     validateUser();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const email = Cookies.get("email");
+      const userId = Cookies.get("userId");
+
+      if (!email || !userId) {
+        console.log("Sesión expirada o cerrada desde otra pestaña");
+        setIsAuthenticated(false);
+      }
+    }, 2000); // check cada 2 segundos
+
+    return () => clearInterval(interval); // limpiar el intervalo al desmontar
+  }, []);
 
   const handleLogin = () => setIsAuthenticated(true);
   const handleLogout = async () => {

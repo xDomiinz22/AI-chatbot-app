@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 
 
 class Token(BaseModel):
-    user_id: int
+    email: str
     expires_at: int
     token: str
 
@@ -19,8 +19,8 @@ class UserLogin(BaseModel):
 
 
 class UserOut(BaseModel):
-    user_id: int
     email: EmailStr
     token: str
+    is_verified: bool
 
     model_config = {"from_attributes": True}

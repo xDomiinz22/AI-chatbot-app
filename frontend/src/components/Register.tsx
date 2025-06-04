@@ -58,6 +58,11 @@ const Register = ({ onRegisterSuccess }: RegisterProps) => {
 
             const data = await response.json();
 
+            if (!data.is_verified) {
+                alert("Verification email sent. Please verify you email before logging in.");
+                return;
+            }
+            
             Cookies.set("token", data.token, {
                 expires: 2,
                 secure: true,
@@ -66,7 +71,7 @@ const Register = ({ onRegisterSuccess }: RegisterProps) => {
             })
             Cookies.set("name", name, { expires: 7 });
             Cookies.set("email", email, { expires: 7 });
-            Cookies.set("user_id", String(data.user_id), {expires: 7});
+            Cookies.set("user_id", String(data.user_id), { expires: 7 });
 
             onRegisterSuccess();
 
