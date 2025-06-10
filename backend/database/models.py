@@ -28,3 +28,11 @@ class EmailVerificationToken(Base):
     email = Column(String, ForeignKey("users.email"), nullable=False)
     token = Column(String, unique=True, index=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
+
+
+class PasswordResetVerificationToken(Base):
+    __tablename__ = "password_reset_verification_tokens"
+    id = Column(Integer, primary_key=True)
+    email = Column(String, ForeignKey("users.email"), nullable=False)
+    token = Column(String, unique=True, index=True)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))

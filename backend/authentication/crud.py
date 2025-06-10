@@ -3,12 +3,26 @@ from datetime import datetime, timedelta, timezone
 import os
 import secrets
 from backend.database.database import SessionLocal, engine, Base
-from backend.database.models import EmailVerificationToken, User, Token
+from backend.database.models import (
+    EmailVerificationToken,
+    PasswordResetVerificationToken,
+    User,
+    Token,
+)
 from backend.database.schemas import UserCreate
 from passlib.context import CryptContext
 import hashlib
 
 from backend.utils.email import EmailVerificationMethods
+
+
+class UserNotFoundException(Exception):
+    def __init__(self, status_code: int, detail: str):
+        self.status_code = status_code
+        self.detail = detail
+
+    def __str__(self):
+        return f"{self.status_code}: {self.detail}"
 
 
 class TokenException(Exception):
@@ -41,6 +55,9 @@ class DatabaseMethods:
         self.db.query(Token).filter(Token.expires_at < now).delete()
         expiry_limit = now - timedelta(minutes=15)
 
+        self.db.query(PasswordResetVerificationToken).filter(
+            PasswordResetVerificationToken.created_at < expiry_limit
+        ).delete()
         self.db.query(EmailVerificationToken).filter(
             EmailVerificationToken.created_at < expiry_limit
         ).delete()
@@ -126,5 +143,43 @@ class DatabaseMethods:
             raise EmailTokenException(status_code=404, detail="User not found")
 
         user.is_verified = True
+        self.db.delete(token_entry)
+        self.db.commit()
+
+    def generate_password_reset_verification_token(self, email: str):
+        token = secrets.token_urlsafe(32)
+        db_token = PasswordResetVerificationToken(email=email, token=token)
+        self.db.add(db_token)
+        self.db.commit()
+        self.db.refresh(db_token)
+        return token
+
+    async def verificate_password_reset(self, user: User):
+        password_reset_token = self.generate_password_reset_verification_token(
+            user.email
+        )
+        await self.email_methods.send_password_reset_verification_email(
+            user.email, password_reset_token
+        )
+
+    def password_reset(self, token: str, new_password: str):
+        token_entry = (
+            self.db.query(PasswordResetVerificationToken).filter_by(token=token).first()
+        )
+        if not token_entry:
+            raise EmailTokenException(status_code=400, detail="Invalid token")
+        created_at_aware = token_entry.created_at.replace(tzinfo=timezone.utc)
+        if datetime.now(timezone.utc) - created_at_aware > timedelta(minutes=15):
+            self.db.delete(token_entry)
+            self.db.commit()
+            raise EmailTokenException(status_code=400, detail="Token expired")
+
+        user = self.db.query(User).filter_by(email=token_entry.email).first()
+
+        if not user:
+            raise UserNotFoundException(status_code=404, detail="User not found")
+
+        user.password = self.pwd_context.hash(new_password)
+
         self.db.delete(token_entry)
         self.db.commit()

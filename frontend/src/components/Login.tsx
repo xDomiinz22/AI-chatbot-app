@@ -1,6 +1,6 @@
 import { useState, FormEvent, useEffect } from "react";
 import Cookies from "js-cookie";
-import { useLocation } from "react-router-dom"
+import ForgotPassword from "./ForgotPassword";
 
 type LoginProps = {
     onLoginSuccess: () => void;
@@ -11,6 +11,7 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
     const [password, setPassword] = useState("")
     const [isMounted, setIsMounted] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -75,50 +76,66 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md border rounded mt-10">
-            <h2 className="text-2xl font-bold text-[#2a9d8f] mb-4 text-center">Login</h2>
-            <div
-                className={`mb-4 h-2 max-w-full transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"
-                    }`}
-                aria-live="polite"
-            >
-                {isMounted && (
-                    <div className="text-[#33bbab] rounded text-center h-full flex items-center justify-center">
-                        Your account has been verified!
+            {!showForgotPassword ? (
+                <>
+                    <h2 className="text-2xl font-bold text-[#2a9d8f] mb-4 text-center">Login</h2>
+                    <div
+                        className={`mb-4 h-2 max-w-full transition-opacity duration-1000 ${isVisible ? "opacity-100" : "opacity-0"}`}
+                        aria-live="polite"
+                    >
+                        {isMounted && (
+                            <div className="text-[#33bbab] rounded text-center h-full flex items-center justify-center">
+                                Your account has been verified!
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block mb-1 font-medium text-[#2a9d8f]">Email:</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-[#2a9d8f] text-gray-500"
-                        placeholder="example@example.com"
-                        required
-                    />
-                </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {/* Inputs de email y password */}
+                        <div>
+                            <label className="block mb-1 font-medium text-[#2a9d8f]">Email:</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-[#2a9d8f] text-gray-500"
+                                placeholder="example@example.com"
+                                required
+                            />
+                        </div>
 
-                <div>
-                    <label className="block mb-1 font-medium text-[#2a9d8f]">Password:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-[#2a9d8f] text-gray-500"
-                        placeholder="••••••••"
-                        required
-                    />
-                </div>
+                        <div>
+                            <label className="block mb-1 font-medium text-[#2a9d8f]">Password:</label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-[#2a9d8f] text-gray-500"
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
 
-                <button
-                    type="submit"
-                    className="w-full bg-[#2a9d8f] text-white py-2 rounded hover:bg-[#238075] transition"
-                >
-                    Send
-                </button>
-            </form>
+                        <button
+                            type="submit"
+                            className="w-full bg-[#2a9d8f] text-white py-2 rounded hover:bg-[#238075] transition"
+                        >
+                            Send
+                        </button>
+                    </form>
+
+                    <div className="mt-4 text-center">
+                        <button
+                            type="button"
+                            onClick={() => setShowForgotPassword(true)}
+                            className="text-sm text-[#27887d] hover:underline"
+                        >
+                            Forgot your password?
+                        </button>
+                    </div>
+                </>
+            ) : (
+                <ForgotPassword onClose={() => setShowForgotPassword(false)} />
+            )}
         </div>
     );
 };

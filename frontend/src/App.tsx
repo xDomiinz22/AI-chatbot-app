@@ -4,10 +4,14 @@ import Login from './components/Login';
 import Register from './components/Register'
 import Cookies from "js-cookie";
 import './App.css';
+import ResetPassword from './components/ResetPassword';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const currentPath = window.location.pathname;
+  const queryParams = new URLSearchParams(window.location.search);
+  const token = queryParams.get("token");
 
   useEffect(() => {
     const validateUser = async () => {
@@ -71,6 +75,17 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
   };
 
+  if (currentPath === "/password-reset" && token) {
+    // Mostrar formulario para resetear contraseña con token
+    return (
+      <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+        <div className="w-full max-w-[600px] bg-white rounded-[10px] shadow-md p-8">
+          <ResetPassword />
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-200 flex items-center justify-center">
@@ -83,7 +98,7 @@ const App: React.FC = () => {
               <Register onRegisterSuccess={handleLogin} />
               <p className="mt-4 text-sm text-center text-[#2a9d8f]">
                 Already have an account?{" "}
-                <button className="ml-[2px] text-[#27887d]" onClick={() => setShowRegister(false)}>
+                <button className="ml-[2px] text-[#27887d] hover:underline" onClick={() => setShowRegister(false)}>
                   Login here
                 </button>
               </p>
@@ -93,7 +108,7 @@ const App: React.FC = () => {
               <Login onLoginSuccess={handleLogin} />
               <p className="mt-4 text-sm text-center text-[#2a9d8f]">
                 Don't have an account?{" "}
-                <button className="ml-[2px] text-[#27887d]" onClick={() => setShowRegister(true)}>
+                <button className="ml-[2px] text-[#27887d] hover:underline" onClick={() => setShowRegister(true)}>
                   Register here
                 </button>
               </p>
@@ -129,6 +144,5 @@ const App: React.FC = () => {
     </div>
   );
 };
-
 
 export default App;

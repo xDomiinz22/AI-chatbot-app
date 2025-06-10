@@ -5,8 +5,9 @@ from backend.authentication.crud import (
     DatabaseMethods,
     EmailTokenException,
     TokenException,
+    UserNotFoundException,
 )
-from backend.database.schemas import UserCreate, UserLogin, UserOut
+from backend.database.schemas import PasswordEmailReset, PasswordReset, UserCreate, UserLogin, UserOut
 
 token_auth = HTTPBearer()
 router = APIRouter()
@@ -74,4 +75,26 @@ def verify_email(token: str):
         db_methods.verificate_email(token)
     except EmailTokenException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-    return RedirectResponse(url="http://localhost:5173/login?verified=true", status_code=302)
+    return RedirectResponse(
+        url="http://localhost:5173/login?verified=true", status_code=302
+    )
+
+
+@router.post("/forgot-password")
+async def password_reset(payload: PasswordEmailReset):
+    try:
+        user = db_methods.get_user_by_email(payload.email)
+        await db_methods.verificate_password_reset(user)
+    except UserNotFoundException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@router.post("/reset-password")
+def reset_password(payload: PasswordReset):
+    try:
+        db_methods.password_reset(payload.token, payload.new_password)
+    except UserNotFoundException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except EmailTokenException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    return {"message": "Password successfully reset"}
