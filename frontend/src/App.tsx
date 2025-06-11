@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Chat from './components/Chat';
 import Login from './components/Login';
 import Register from './components/Register'
+import Conversations from './components/Conversations';
+import { MessageType } from './components/Message';
 import Cookies from "js-cookie";
 import './App.css';
 import ResetPassword from './components/ResetPassword';
@@ -12,6 +14,7 @@ const App: React.FC = () => {
   const currentPath = window.location.pathname;
   const queryParams = new URLSearchParams(window.location.search);
   const token = queryParams.get("token");
+  const [messages, setMessages] = useState<MessageType[]>([]);
 
   useEffect(() => {
     const validateUser = async () => {
@@ -43,9 +46,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const email = Cookies.get("email");
-      const userId = Cookies.get("userId");
+      const token = Cookies.get("token");
 
-      if (!email || !userId) {
+      if (!email || !token) {
         console.log("Sesión expirada o cerrada desde otra pestaña");
         setIsAuthenticated(false);
       }
@@ -124,6 +127,7 @@ const App: React.FC = () => {
       {/* Sidebar izquierda */}
       <aside className="fixed top-0 left-0 h-screen w-[20%] bg-white shadow-md z-10 flex flex-col items-center py-4">
         <h1 className="font-bold text-2xl text-[#2a9d8f] mb-6 text-center">Menu</h1>
+        <Conversations messages={messages} setMessages={setMessages} />
         <button
           onClick={handleLogout}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition mt-auto"
@@ -138,7 +142,7 @@ const App: React.FC = () => {
           <h1 className="font-bold text-4xl text-[#2a9d8f] mb-6 text-center">
             Mini-AI-Chatbot
           </h1>
-          <Chat />
+          <Chat messages={messages} setMessages={setMessages} />
         </div>
       </main>
     </div>

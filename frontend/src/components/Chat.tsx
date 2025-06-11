@@ -3,6 +3,10 @@ import Message from './Message';
 import SettingsPanel from './SettingsPanel';
 import Cookies from "js-cookie";
 
+type ChatProps = {
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+}
 
 type ProviderName = "OpenAI" | "HuggingFace" | "Google";
 
@@ -15,14 +19,13 @@ type Message = {
   text: string;
 };
 
-function Chat() {
+function Chat({ messages, setMessages }: ChatProps) {
   const providers: Providers = {
     OpenAI: ["gpt-3.5-turbo", "gpt-4"],
     HuggingFace: ["distilbert-base", "bert-large"],
     Google: ["gemini-2.0-flash"],
   };
 
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [provider, setProvider] = useState<ProviderName>("Google");
   const [model, setModel] = useState<string>(providers["Google"][0]);
@@ -174,7 +177,7 @@ function Chat() {
           >
             ⚙️
           </button>
- 
+
           {showSettings && (
             <SettingsPanel
               ref={settingsRef}

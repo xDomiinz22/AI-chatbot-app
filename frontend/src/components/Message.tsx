@@ -1,7 +1,9 @@
-type MessageProps = {
+type MessageType = {
   sender: "user" | "bot";
   text: string;
 };
+
+type MessageProps = MessageType
 
 function Message({ sender, text }: MessageProps) {
   const baseClasses = "my-2 max-w-[80%] px-4 py-2 rounded-[15px] text-base leading-[1.3] break-words";
@@ -19,3 +21,4 @@ function Message({ sender, text }: MessageProps) {
 }
 
 export default Message;
+export { MessageType };
