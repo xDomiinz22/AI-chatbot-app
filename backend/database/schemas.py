@@ -1,6 +1,27 @@
 from pydantic import BaseModel, EmailStr
 
 
+class MessageOut(BaseModel):
+    text: str
+    sender: str
+
+
+class newMessage(BaseModel):
+    conversation_id: int
+    text: str
+    sender: str
+
+
+class ConversationOut(BaseModel):
+    title: str
+    id: int
+
+
+class newConversation(BaseModel):
+    email: EmailStr
+    title: str
+
+
 class PasswordEmailReset(BaseModel):
     email: EmailStr
 

@@ -36,3 +36,20 @@ class PasswordResetVerificationToken(Base):
     email = Column(String, ForeignKey("users.email"), nullable=False)
     token = Column(String, unique=True, index=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
+
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id = Column(Integer, primary_key=True)
+    user_email = Column(String, ForeignKey("users.email"), nullable=False)
+    title = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"))
+    sender = Column(String, nullable=False)
+    text = Column(String)
+    timestamp = Column(DateTime, default=datetime.now(timezone.utc))

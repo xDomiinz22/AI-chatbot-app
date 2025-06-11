@@ -4,12 +4,14 @@ import os
 import secrets
 from backend.database.database import SessionLocal, engine, Base
 from backend.database.models import (
+    Conversation,
     EmailVerificationToken,
+    Message,
     PasswordResetVerificationToken,
     User,
     Token,
 )
-from backend.database.schemas import UserCreate
+from backend.database.schemas import ConversationOut, UserCreate
 from passlib.context import CryptContext
 import hashlib
 
@@ -183,3 +185,15 @@ class DatabaseMethods:
 
         self.db.delete(token_entry)
         self.db.commit()
+
+    def create_new_conversation(self, title: str, email: str) -> ConversationOut:
+        new_conversation = Conversation(user_email=email, title=title)
+        self.db.add(new_conversation)
+        self.db.commit()
+        return new_conversation
+
+    def create_new_message(self, conversation_id: int, text: str, sender: str):
+        new_message = Message(conversation_id=conversation_id, text=text, sender=sender)
+        self.db.add(new_message)
+        self.db.commit()
+        return new_message

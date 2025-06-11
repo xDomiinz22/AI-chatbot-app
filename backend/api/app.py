@@ -4,11 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.ai_providers.agent_wrapper import ModelAgent
 from backend.database.database import Base, engine
-from backend.api.routes import user
+from backend.api.routes import conversation, user
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 app.include_router(user.router)
+app.include_router(conversation.router)
 
 # Configuración CORS
 origins = [
