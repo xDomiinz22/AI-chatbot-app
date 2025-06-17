@@ -241,3 +241,15 @@ class DatabaseMethods:
         self.db.commit()
         self.db.delete(conv)
         self.db.commit()
+
+    def rename_conversation(self, email: str, conversation_id: int, title: str):
+        conv = (
+            self.db.query(Conversation)
+            .filter(Conversation.user_email == email)
+            .filter(Conversation.id == conversation_id)
+            .first()
+        )
+        if not conv:
+            raise ConversationNotFoundException(404, "Conversation not found.")
+        conv.title = title
+        self.db.commit()

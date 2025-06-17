@@ -266,7 +266,7 @@ const Conversations: React.FC<ConversationsProps> = ({ messages, setMessages }) 
   };
 
   const handleRename = async (convId: number) => {
-    const newTitle = prompt("Nuevo título de la conversación:");
+    const newTitle = prompt("New conversation title:");
     if (!newTitle) return;
 
     try {

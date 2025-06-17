@@ -1,6 +1,11 @@
 from pydantic import BaseModel, EmailStr
 
 
+class RenameConversation(BaseModel):
+    id: int
+    title: str
+
+
 class MessageOut(BaseModel):
     text: str
     sender: str

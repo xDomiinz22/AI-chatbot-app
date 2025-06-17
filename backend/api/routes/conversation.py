@@ -8,6 +8,7 @@ from backend.authentication.crud import (
 from backend.database.schemas import (
     ConversationOut,
     MessageOut,
+    RenameConversation,
     newConversation,
     newMessage,
 )
@@ -74,5 +75,17 @@ async def delete_conversation(
     try:
         db_user = db_methods.get_user_by_token(credentials.credentials)
         db_methods.delete_conversation(db_user.email, conversation_id)
+    except TokenException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@router.put("/rename_conversation")
+async def rename_conversation(
+    rename: RenameConversation,
+    credentials: HTTPAuthorizationCredentials = Depends(token_auth),
+):
+    try:
+        db_user = db_methods.get_user_by_token(credentials.credentials)
+        db_methods.rename_conversation(db_user.email, rename.id, rename.title)
     except TokenException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
