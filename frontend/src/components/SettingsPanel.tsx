@@ -25,9 +25,6 @@ const SettingsPanel = forwardRef<HTMLDivElement, SettingsPanelProps>(
                 className={`absolute right-0 bottom-full mb-2 z-20 w-64 p-4 bg-white/80 backdrop-blur-md border border-gray-300 
   rounded-md shadow-lg transition-all duration-300 ease-in-out transform
   ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}`}
-
-
-
             >
                 <div className="mb-3">
                     <label className="block text-sm font-medium mb-1">Provider:</label>

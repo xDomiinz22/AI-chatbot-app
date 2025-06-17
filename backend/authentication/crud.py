@@ -2,6 +2,7 @@ import base64
 from datetime import datetime, timedelta, timezone
 import os
 import secrets
+from typing import List
 from backend.database.database import SessionLocal, engine, Base
 from backend.database.models import (
     Conversation,
@@ -11,7 +12,7 @@ from backend.database.models import (
     User,
     Token,
 )
-from backend.database.schemas import ConversationOut, UserCreate
+from backend.database.schemas import ConversationOut, MessageOut, UserCreate
 from passlib.context import CryptContext
 import hashlib
 
@@ -192,8 +193,26 @@ class DatabaseMethods:
         self.db.commit()
         return new_conversation
 
-    def create_new_message(self, conversation_id: int, text: str, sender: str):
+    def create_new_message(
+        self, conversation_id: int, text: str, sender: str
+    ) -> MessageOut:
         new_message = Message(conversation_id=conversation_id, text=text, sender=sender)
         self.db.add(new_message)
         self.db.commit()
         return new_message
+
+    def get_user_conversations(self, email: str) -> List[ConversationOut]:
+        return (
+            self.db.query(Conversation)
+            .filter(Conversation.user_email == email)
+            .order_by(Conversation.created_at.desc())
+            .all()
+        )
+
+    def get_conversation_messages(self, conversation_id: int) -> List[MessageOut]:
+        return (
+            self.db.query(Message)
+            .filter(Message.conversation_id == conversation_id)
+            .order_by(Message.timestamp.desc())
+            .all()
+        )

@@ -1,6 +1,7 @@
 type MessageType = {
   sender: "user" | "bot";
   text: string;
+  conversationId?: number | null;
 };
 
 type MessageProps = MessageType

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from backend.authentication.crud import (
     DatabaseMethods,
@@ -16,7 +17,26 @@ router = APIRouter()
 db_methods = DatabaseMethods()
 
 
-@router.post("/conversations", response_model=ConversationOut)
+@router.get("/get_conversations", response_model=List[ConversationOut])
+def get_conversations_by_email(token: str = Query(..., description="User token")):
+    try:
+        db_user = db_methods.get_user_by_token(token)
+        user_conversations = db_methods.get_user_conversations(db_user.email)
+        return user_conversations
+    except TokenException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@router.get("/get_messages/{conversation_id}", response_model=List[MessageOut])
+def get_messages_by_conversation(conversation_id: int):
+    try:
+        user_conversations = db_methods.get_conversation_messages(conversation_id)
+        return user_conversations
+    except TokenException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@router.post("/add_conversation", response_model=ConversationOut)
 async def new_conversation(
     conversation: newConversation,
     credentials: HTTPAuthorizationCredentials = Depends(token_auth),
@@ -31,7 +51,7 @@ async def new_conversation(
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
-@router.post("/messages", response_model=MessageOut)
+@router.post("/add_messages", response_model=MessageOut)
 async def new_message(
     message: newMessage,
     credentials: HTTPAuthorizationCredentials = Depends(token_auth),

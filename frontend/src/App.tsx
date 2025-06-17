@@ -123,9 +123,9 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-200">
+    <div className="flex h-screen bg-gray-200 overflow-visible">
       {/* Sidebar izquierda */}
-      <aside className="fixed top-0 left-0 h-screen w-[20%] bg-white shadow-md z-10 flex flex-col items-center py-4">
+      <aside className="fixed top-0 left-0 h-screen w-[20%] bg-white shadow-md z-10 flex flex-col items-center py-4 overflow-visible">
         <h1 className="font-bold text-2xl text-[#2a9d8f] mb-6 text-center">Menu</h1>
         <Conversations messages={messages} setMessages={setMessages} />
         <button
