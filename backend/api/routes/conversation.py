@@ -64,3 +64,15 @@ async def new_message(
         return MessageOut(text=new_message.text, sender=new_message.sender)
     except TokenException as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@router.delete("/delete_conversation/{conversation_id}")
+async def delete_conversation(
+    conversation_id: int,
+    credentials: HTTPAuthorizationCredentials = Depends(token_auth),
+):
+    try:
+        db_user = db_methods.get_user_by_token(credentials.credentials)
+        db_methods.delete_conversation(db_user.email, conversation_id)
+    except TokenException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)

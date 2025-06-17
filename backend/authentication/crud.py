@@ -28,6 +28,15 @@ class UserNotFoundException(Exception):
         return f"{self.status_code}: {self.detail}"
 
 
+class ConversationNotFoundException(Exception):
+    def __init__(self, status_code: int, detail: str):
+        self.status_code = status_code
+        self.detail = detail
+
+    def __str__(self):
+        return f"{self.status_code}: {self.detail}"
+
+
 class TokenException(Exception):
     def __init__(self, status_code: int, detail: str):
         self.status_code = status_code
@@ -216,3 +225,19 @@ class DatabaseMethods:
             .order_by(Message.timestamp.desc())
             .all()
         )
+
+    def delete_conversation(self, email: str, conversation_id: int):
+        conv = (
+            self.db.query(Conversation)
+            .filter(Conversation.user_email == email)
+            .filter(Conversation.id == conversation_id)
+            .first()
+        )
+        if not conv:
+            raise ConversationNotFoundException(404, "Conversation not found.")
+        messages = self.get_conversation_messages(conv.id)
+        for m in messages:
+            self.db.delete(m)
+        self.db.commit()
+        self.db.delete(conv)
+        self.db.commit()
